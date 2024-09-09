@@ -1,6 +1,12 @@
 import React from "react";
 import { Code2, Github, Heart } from "lucide-react";
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 const NoShowsView = () => {
@@ -15,9 +21,7 @@ const NoShowsView = () => {
                 phashboards
               </span>
             </CardTitle>{" "}
-            <CardDescription>
-                Your personal Phish dashboard
-            </CardDescription>
+            <CardDescription>Your personal Phish dashboard</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="mb-4">
@@ -71,9 +75,15 @@ const NoShowsView = () => {
                 This project is open-source and available on GitHub. We welcome
                 contributions, feedback, and feature requests!
               </p>
-              <Button variant="outline" className="w-full">
-                <Github className="mr-2 h-4 w-4" /> View on GitHub
-              </Button>
+              <a
+                href="https://github.com/paradise-runner/phashboards"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="outline" className="w-full">
+                  <Github className="mr-2 h-4 w-4" /> View on GitHub
+                </Button>
+              </a>
             </CardContent>
           </Card>
 
@@ -90,7 +100,6 @@ const NoShowsView = () => {
                 <li>Contributing code</li>
                 <li>Reporting bugs</li>
                 <li>Sharing with fans</li>
-                <li>Donating</li>
               </ul>
             </CardContent>
           </Card>

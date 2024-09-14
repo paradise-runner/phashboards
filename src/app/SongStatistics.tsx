@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Song, ShowWithSongs } from './interfaces';
 import { getEvenlyDistributedColorGenerator } from './Utils';
+import TotalSongsCard from './cards/TotalSongsCard'
 
 interface SongStatisticsProps {
   songs: Song[];
@@ -85,6 +86,7 @@ const SongStatistics: React.FC<SongStatisticsProps> = ({ songs, shows, loadingSo
 
   return (
     <>
+      <TotalSongsCard songs={songs} />
       <Card className="flex flex-col h-[400px]">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

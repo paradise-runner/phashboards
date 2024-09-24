@@ -27,7 +27,7 @@ import NoShowsView from "@/app/NoShowsView";
 import GradientHomeIcon from "@/app/GradientHomeIcon";
 import { PALETTES } from "./Utils";
 
-import { Show, ApiResponse, Song, SetlistApiResponse } from "./interfaces";
+import { Show, ApiResponse, Song, SetlistApiResponse, ShowSetlist } from "@/app/interfaces";
 
 const API_KEY = process.env.NEXT_PUBLIC_PHISH_NET_API_KEY;
 
@@ -119,25 +119,30 @@ const Dashboard = () => {
     const songCounts: Record<string, number> = {};
     const showsWithSongsData: { showdate: string; songs: string[] }[] = [];
 
-    for (const show of shows) {
-      try {
-        const response = await fetch(
-          `https://api.phish.net/v5/setlists/showid/${show.showid}.json?apikey=${API_KEY}`
-        );
-        if (!response.ok) {
-          throw new Error(`Failed to fetch setlist for show ${show.showid}`);
-        }
-        const data: SetlistApiResponse = await response.json();
-        const songs = data.data.map((song: { song: string }) => song.song);
-        showsWithSongsData.push({ showdate: show.showdate, songs });
+    const showIdParams = shows.map((show) => `showid=${show.showid}`).join("&");
+    const url = `https://phish-multi-setlist.edward-e01.workers.dev?${showIdParams}`;
+    try {
+      const response = await fetch(url);
+      const data: SetlistApiResponse = await response.json();
+      data.body.data.forEach((setlist: ShowSetlist) => {
+        const songs = setlist.map((song: any) => song.song);
+        showsWithSongsData.push({ showdate: setlist[0].showdate, songs });
+  
         songs.forEach((song: string) => {
-          songCounts[song] = (songCounts[song] || 0) + 1;
+          if (songCounts[song]) {
+            songCounts[song]++;
+          } else {
+            songCounts[song] = 1;
+          }
         });
-      } catch (error) {
-        console.error(`Error fetching setlist for show ${show.showid}:`, error);
-      }
-    }
-
+      });
+    } catch (error) {
+      console.error("Error fetching setlists:", error);
+      setError("An error occurred while fetching data. Please try again.");
+      setLoadingSongs(false);
+      return;
+    } 
+    
     const sortedSongs = Object.entries(songCounts)
       .map(([song, count]) => ({ song, count }))
       .sort((a, b) => b.count - a.count);
@@ -219,7 +224,7 @@ const Dashboard = () => {
           <div className="flex space-x-2">
             <Input
               type="text"
-              placeholder="Enter your username"
+              placeholder="Enter your Phish.net username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="flex-grow"

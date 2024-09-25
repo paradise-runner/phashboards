@@ -124,17 +124,20 @@ const Dashboard = () => {
     try {
       const response = await fetch(url);
       const data: SetlistApiResponse = await response.json();
-      data.body.data.forEach((setlist: ShowSetlist) => {
-        const songs = setlist.map((song: any) => song.song);
-        showsWithSongsData.push({ showdate: setlist[0].showdate, songs });
-  
-        songs.forEach((song: string) => {
-          if (songCounts[song]) {
-            songCounts[song]++;
-          } else {
-            songCounts[song] = 1;
-          }
-        });
+      data.body.data.forEach((song: any) => {
+        console.log('Song:', song);
+        if (songCounts[song.song]) {
+          songCounts[song.song]++;
+        } else {
+          songCounts[song.song] = 1
+        }
+        const showIndex = showsWithSongsData.findIndex((show) => show.showdate === song.showdate);
+
+        if (showIndex === -1) {
+          showsWithSongsData.push({ showdate: song.showdate, songs: [song.song] });
+        } else {
+          showsWithSongsData[showIndex].songs.push(song.song);
+        }
       });
     } catch (error) {
       console.error("Error fetching setlists:", error);

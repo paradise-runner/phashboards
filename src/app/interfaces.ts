@@ -19,9 +19,9 @@ export interface Show {
     count: number;
   }
   
-  interface SetlistApiResponse {
+  export interface SetlistApiResponse {
     body: {
-      data: ShowSetlist[][];
+      data: ShowSetlist[];
     };
     headers: {
       'content-type': string;
@@ -30,7 +30,7 @@ export interface Show {
     statusText: string;
   }
   
-  interface ShowSetlist {
+  export interface ShowSetlist {
     artist_name: string;
     artist_slug: string;
     artistid: string;

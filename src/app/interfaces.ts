@@ -29,6 +29,11 @@ export interface Show {
     status: number;
     statusText: string;
   }
+
+  export interface ShowWithSongs {
+    showdate: string;
+    songs: string[];
+  }
   
   export interface ShowSetlist {
     artist_name: string;

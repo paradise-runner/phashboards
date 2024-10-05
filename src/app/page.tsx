@@ -241,20 +241,6 @@ const Dashboard = () => {
 
         {shows.length > 0 ? (
           <div className="space-y-16">
-            <section className="bg-card rounded-lg shadow-xl p-6 dark:outline outline-offset-1 outline-purple-400">
-              <h2 className="text-3xl font-semibold mb-6 flex items-center">
-                <Music className="mr-2" /> Run Statistics
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <RunStatistics
-                  shows={shows}
-                  showsWithSongs={showsWithSongs}
-                  selectedPalette={selectedPalette}
-                />
-              </div>
-            </section>
-
-            <Separator className="my-8" />
             <section className="bg-card rounded-lg shadow-xl p-6 dark:outline outline-offset-1 outline-blue-400">
               <h2 className="text-3xl font-semibold mb-6 flex items-center">
                 <Music className="mr-2" /> Song Statistics
@@ -282,6 +268,21 @@ const Dashboard = () => {
                 />
               </div>
             </section>
+            <Separator className="my-8" />
+            <section className="bg-card rounded-lg shadow-xl p-6 dark:outline outline-offset-1 outline-purple-400">
+              <h2 className="text-3xl font-semibold mb-6 flex items-center">
+                <Music className="mr-2" /> Run Statistics
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <RunStatistics
+                  shows={shows}
+                  showsWithSongs={showsWithSongs}
+                  selectedPalette={selectedPalette}
+                />
+              </div>
+            </section>
+
+            
           </div>
         ) : (
           <NoShowsView />

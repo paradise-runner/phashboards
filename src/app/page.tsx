@@ -27,7 +27,7 @@ import NoShowsView from "@/app/NoShowsView";
 import GradientHomeIcon from "@/app/GradientHomeIcon";
 import { PALETTES } from "./Utils";
 
-import { Show, ApiResponse, Song, SetlistApiResponse, ShowSetlist } from "@/app/interfaces";
+import { Show, ApiResponse, Song, SetlistApiResponse } from "./interfaces";
 
 const API_KEY = process.env.NEXT_PUBLIC_PHISH_NET_API_KEY;
 
@@ -119,33 +119,25 @@ const Dashboard = () => {
     const songCounts: Record<string, number> = {};
     const showsWithSongsData: { showdate: string; songs: string[] }[] = [];
 
-    const showIdParams = shows.map((show) => `showid=${show.showid}`).join("&");
-    const url = `https://phish-multi-setlist.edward-e01.workers.dev?${showIdParams}`;
-    try {
-      const response = await fetch(url);
-      const data: SetlistApiResponse = await response.json();
-      data.body.data.forEach((song: any) => {
-        console.log('Song:', song);
-        if (songCounts[song.song]) {
-          songCounts[song.song]++;
-        } else {
-          songCounts[song.song] = 1
+    for (const show of shows) {
+      try {
+        const response = await fetch(
+          `https://api.phish.net/v5/setlists/showid/${show.showid}.json?apikey=${API_KEY}`
+        );
+        if (!response.ok) {
+          throw new Error(`Failed to fetch setlist for show ${show.showid}`);
         }
-        const showIndex = showsWithSongsData.findIndex((show) => show.showdate === song.showdate);
+        const data: SetlistApiResponse = await response.json();
+        const songs = data.data.map((song: { song: string }) => song.song);
+        showsWithSongsData.push({ showdate: show.showdate, songs });
+        songs.forEach((song: string) => {
+          songCounts[song] = (songCounts[song] || 0) + 1;
+        });
+      } catch (error) {
+        console.error(`Error fetching setlist for show ${show.showid}:`, error);
+      }
+    }
 
-        if (showIndex === -1) {
-          showsWithSongsData.push({ showdate: song.showdate, songs: [song.song] });
-        } else {
-          showsWithSongsData[showIndex].songs.push(song.song);
-        }
-      });
-    } catch (error) {
-      console.error("Error fetching setlists:", error);
-      setError("An error occurred while fetching data. Please try again.");
-      setLoadingSongs(false);
-      return;
-    } 
-    
     const sortedSongs = Object.entries(songCounts)
       .map(([song, count]) => ({ song, count }))
       .sort((a, b) => b.count - a.count);
@@ -227,7 +219,7 @@ const Dashboard = () => {
           <div className="flex space-x-2">
             <Input
               type="text"
-              placeholder="Enter your Phish.net username"
+              placeholder="Enter your username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="flex-grow"
@@ -241,6 +233,20 @@ const Dashboard = () => {
 
         {shows.length > 0 ? (
           <div className="space-y-16">
+            <section className="bg-card rounded-lg shadow-xl p-6 dark:outline outline-offset-1 outline-purple-400">
+              <h2 className="text-3xl font-semibold mb-6 flex items-center">
+                <Music className="mr-2" /> Run Statistics
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <RunStatistics
+                  shows={shows}
+                  showsWithSongs={showsWithSongs}
+                  selectedPalette={selectedPalette}
+                />
+              </div>
+            </section>
+
+            <Separator className="my-8" />
             <section className="bg-card rounded-lg shadow-xl p-6 dark:outline outline-offset-1 outline-blue-400">
               <h2 className="text-3xl font-semibold mb-6 flex items-center">
                 <Music className="mr-2" /> Song Statistics
@@ -268,21 +274,6 @@ const Dashboard = () => {
                 />
               </div>
             </section>
-            <Separator className="my-8" />
-            <section className="bg-card rounded-lg shadow-xl p-6 dark:outline outline-offset-1 outline-purple-400">
-              <h2 className="text-3xl font-semibold mb-6 flex items-center">
-                <Music className="mr-2" /> Run Statistics
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <RunStatistics
-                  shows={shows}
-                  showsWithSongs={showsWithSongs}
-                  selectedPalette={selectedPalette}
-                />
-              </div>
-            </section>
-
-            
           </div>
         ) : (
           <NoShowsView />

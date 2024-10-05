@@ -1,6 +1,6 @@
 # phashboards
 
-phashboards is a personal Phish dashboard that allows phans to visualize and analyze their show attendance and song statistics.
+phashboards is a personal Phish dashboard that allows fans to visualize and analyze their show attendance and song statistics.
 
 ![graphs](./graphs.png)
 
@@ -90,5 +90,4 @@ This project is open source and available under the [MIT License](LICENSE).
 - [Phish.net](https://phish.net) for providing the API and data
 - [shadcn/ui](https://ui.shadcn.com/) for the beautiful component library
 - [Recharts](https://recharts.org/) for the charting library
-- [phish-multi-setlist](https://github.com/paradise-runner/phish-multi-setlist) as a caching layer for set lists so the good people at phish.net don't get hit too hard
 - All the Phish fans who inspired this project

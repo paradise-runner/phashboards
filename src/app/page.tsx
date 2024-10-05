@@ -66,7 +66,10 @@ interface PaletteSelectorProps {
   onPaletteChange: (palette: string) => void;
 }
 
-const PaletteSelector: React.FC<PaletteSelectorProps> = ({ selectedPalette, onPaletteChange }) => {
+const PaletteSelector: React.FC<PaletteSelectorProps> = ({
+  selectedPalette,
+  onPaletteChange,
+}) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -77,9 +80,15 @@ const PaletteSelector: React.FC<PaletteSelectorProps> = ({ selectedPalette, onPa
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {Object.keys(PALETTES).map((palette) => (
-          <DropdownMenuItem key={palette} onClick={() => onPaletteChange(palette)}>
+          <DropdownMenuItem
+            key={palette}
+            onClick={() => onPaletteChange(palette)}
+          >
             <div className="flex items-center">
-              <div className="w-4 h-4 mr-2 rounded" style={{ backgroundColor: PALETTES[palette][0] }} />
+              <div
+                className="w-4 h-4 mr-2 rounded"
+                style={{ backgroundColor: PALETTES[palette][0] }}
+              />
               <span className="capitalize">{palette}</span>
             </div>
           </DropdownMenuItem>
@@ -102,7 +111,7 @@ const Dashboard = () => {
   const [selectedPalette, setSelectedPalette] = useState("default");
 
   const handlePaletteChange = (newPalette: string) => {
-    console.log('Changing palette to:', newPalette);
+    console.log("Changing palette to:", newPalette);
     setSelectedPalette(newPalette);
   };
 
@@ -199,7 +208,10 @@ const Dashboard = () => {
             </Button>
           </div>
           <div className="flex items-center space-x-2">
-            <PaletteSelector selectedPalette={selectedPalette} onPaletteChange={handlePaletteChange} />
+            <PaletteSelector
+              selectedPalette={selectedPalette}
+              onPaletteChange={handlePaletteChange}
+            />
             <ThemeToggle />
           </div>
         </div>
@@ -235,17 +247,15 @@ const Dashboard = () => {
           <div className="space-y-16">
             <section className="bg-card rounded-lg shadow-xl p-6 dark:outline outline-offset-1 outline-purple-400">
               <h2 className="text-3xl font-semibold mb-6 flex items-center">
-                <Music className="mr-2" /> Run Statistics
+                <BarChart className="mr-2" /> Show Statistics
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <RunStatistics
+                <ShowStatistics
                   shows={shows}
-                  showsWithSongs={showsWithSongs}
                   selectedPalette={selectedPalette}
                 />
               </div>
             </section>
-
             <Separator className="my-8" />
             <section className="bg-card rounded-lg shadow-xl p-6 dark:outline outline-offset-1 outline-blue-400">
               <h2 className="text-3xl font-semibold mb-6 flex items-center">
@@ -260,16 +270,15 @@ const Dashboard = () => {
                 />
               </div>
             </section>
-
             <Separator className="my-8" />
-
             <section className="bg-card rounded-lg shadow-xl p-6 dark:outline outline-offset-1 outline-purple-400">
               <h2 className="text-3xl font-semibold mb-6 flex items-center">
-                <BarChart className="mr-2" /> Show Statistics
+                <Music className="mr-2" /> Run Statistics
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <ShowStatistics
+                <RunStatistics
                   shows={shows}
+                  showsWithSongs={showsWithSongs}
                   selectedPalette={selectedPalette}
                 />
               </div>

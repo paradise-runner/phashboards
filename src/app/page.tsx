@@ -28,6 +28,7 @@ import GradientHomeIcon from "@/app/GradientHomeIcon";
 import { PALETTES } from "./Utils";
 
 import { Show, ApiResponse, Song, SetlistApiResponse } from "./interfaces";
+import { useRouter } from "next/navigation";
 
 const API_KEY = process.env.NEXT_PUBLIC_PHISH_NET_API_KEY;
 
@@ -99,7 +100,11 @@ const PaletteSelector: React.FC<PaletteSelectorProps> = ({
 };
 
 const Dashboard = () => {
-  const [username, setUsername] = useState("");
+  const router = useRouter();
+  const searchParams = new URLSearchParams(window.location.search);
+  const initialUsername = searchParams.get("username") || "";
+
+  const [username, setUsername] = useState(initialUsername);
   const [shows, setShows] = useState<Show[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -121,6 +126,7 @@ const Dashboard = () => {
     setSongs([]);
     setShowsWithSongs([]);
     setError(null);
+    router.push("/");
   };
 
   const fetchSetlists = async () => {
@@ -169,6 +175,7 @@ const Dashboard = () => {
     }
     setLoading(true);
     setError(null);
+    router.push(`/?username=${username}`);
     try {
       const response = await fetch(
         `https://api.phish.net/v5/attendance/username/${username}.json?apikey=${API_KEY}`
@@ -193,6 +200,12 @@ const Dashboard = () => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (initialUsername) {
+      fetchUserShows();
+    }
+  }, [initialUsername]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -231,7 +244,7 @@ const Dashboard = () => {
           <div className="flex space-x-2">
             <Input
               type="text"
-              placeholder="Enter your username"
+              placeholder="Enter your phish.net username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="flex-grow"

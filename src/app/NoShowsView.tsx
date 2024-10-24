@@ -1,5 +1,5 @@
 import React from "react";
-import { Code2, Github, Heart } from "lucide-react";
+import { Code2, Github, Heart, Music } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -81,26 +81,32 @@ const NoShowsView = () => {
                 rel="noopener noreferrer"
               >
                 <Button variant="outline" className="w-full">
-                  <Github className="mr-2 h-4 w-4" /> View on GitHub
+                  View on GitHub
                 </Button>
               </a>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Heart className="h-6 w-6" />
-                Support Us
+                <Music className="h-6 w-6" />
+                Tapehendge
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm mb-2">Support the project by:</p>
-              <ul className="list-disc pl-5 text-sm space-y-1">
-                <li>Contributing code</li>
-                <li>Reporting bugs</li>
-                <li>Sharing with fans</li>
-              </ul>
+              <p className="mb-4 text-sm">
+                Listen to Phish shows from your personal collection on
+                Tapehendge, a free service for Phish fans.
+              </p>
+            <a
+                href="https://hec.works/tapehendge"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="outline" className="w-full">
+                  Listen on Tapehendge
+                </Button>
+              </a>
             </CardContent>
           </Card>
         </div>

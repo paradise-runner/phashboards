@@ -20,12 +20,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
-import SongStatistics from "@/app/SongStatistics";
-import ShowStatistics from "@/app/ShowStatistics";
-import RunStatistics from "@/app/RunStatistics";
-import NoShowsView from "@/app/NoShowsView";
-import GradientHomeIcon from "@/app/GradientHomeIcon";
+import SongStatistics from "./SongStatistics";
+import ShowStatistics from "./ShowStatistics";
+import RunStatistics from "./RunStatistics";
+import NoShowsView from "./NoShowsView";
+import GradientHomeIcon from "./GradientHomeIcon";
+import UserProfileCard from "./cards/UserProfileCard";
 import { PALETTES } from "./Utils";
+import { useSearchParams } from 'next/navigation';
 
 import { Show, ApiResponse, Song, SetlistApiResponse } from "./interfaces";
 import { useRouter } from "next/navigation";
@@ -101,7 +103,7 @@ const PaletteSelector: React.FC<PaletteSelectorProps> = ({
 
 const Dashboard = () => {
   const router = useRouter();
-  const searchParams = new URLSearchParams(window.location.search);
+  const searchParams = useSearchParams();
   const initialUsername = searchParams.get("username") || "";
 
   const [username, setUsername] = useState(initialUsername);
@@ -240,6 +242,13 @@ const Dashboard = () => {
           </p>
         </div>
 
+        {shows.length > 0 ? (
+          <div className="flex justify-center mb-12">
+          <UserProfileCard username={username} shows={shows}/>
+          </div>
+        ) : (
+
+
         <div className="mb-12 max-w-md mx-auto">
           <div className="flex space-x-2">
             <Input
@@ -255,6 +264,7 @@ const Dashboard = () => {
           </div>
           {error && <p className="text-red-500 mt-2">{error}</p>}
         </div>
+        )}
 
         {shows.length > 0 ? (
           <div className="space-y-16">

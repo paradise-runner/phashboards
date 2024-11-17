@@ -28,9 +28,11 @@ import GradientHomeIcon from "./GradientHomeIcon";
 import UserProfileCard from "./cards/UserProfileCard";
 import { PALETTES } from "./Utils";
 import { useSearchParams } from 'next/navigation';
+import JamCard from "./components/JamCard";
 
-import { Show, ApiResponse, Song, SetlistApiResponse } from "./interfaces";
+import type { Show, ApiResponse, Song, SetlistApiResponse, TapeHendgeSong, Jam, TapeHendgeShow } from "./interfaces";
 import { useRouter } from "next/navigation";
+import type { EnhancedJamSong } from "./interfaces";
 
 const API_KEY = process.env.NEXT_PUBLIC_PHISH_NET_API_KEY;
 
@@ -116,6 +118,7 @@ const Dashboard = () => {
     { showdate: string; songs: string[] }[]
   >([]);
   const [selectedPalette, setSelectedPalette] = useState("default");
+  const [jamSongs, setJamSongs] = useState<EnhancedJamSong[]>([]);
 
   const handlePaletteChange = (newPalette: string) => {
     console.log("Changing palette to:", newPalette);
@@ -196,6 +199,94 @@ const Dashboard = () => {
           new Date(b.showdate).getTime() - new Date(a.showdate).getTime()
       );
       setShows(sortedShows);
+
+      // next step, is fetching relevant jam data from the api, then querying the tapehendge api for hosted song data, allowing us to present 
+      // the user with their 'jam playlist', where they can stream all the certified jams from their attended shows
+      // Steps:
+      // 1. Query PhishNet API For JamCharts for years of attendance 
+      // 2. Filter out jams that are not from the shows attended
+      // 3. Query TapeHendge API for all shows
+      // 4. Filter out shows that do not match the shows attended and shows with no jams
+      // 5. For each show, query the TapeHendge API for the songs played in that show
+      // 6. Filter out songs that are not in the jams list
+
+      const yearsAttended = sortedShows.map((show) => new Date(show.showdate).getFullYear());
+
+      let jams: Jam[] = [];
+
+      // Query PhishNet API for JamCharts for years of attendance
+      for (const year of yearsAttended) {
+        const response = await fetch(
+          `https://api.phish.net/v5/jamcharts/showyear/${year}.json?apikey=${API_KEY}`
+        );
+        if (!response.ok) {
+          throw new Error(`Failed to fetch jamcharts for year ${year}`);
+        }
+        const jamData: { data: Jam[] } = await response.json();
+        jams = [...jams, ...jamData.data];
+      }
+
+      // Filter out jams that are not from the shows attended
+      const jamsFromAttendedShows = jams.filter(jam => sortedShows.some(show => show.showid.toString() === jam.showid));
+
+      // Query TapeHendge API for all shows
+      const tapeHendgeResponse = await fetch(
+        "https://hec.works/api/shows"
+      );
+      // example response
+      // [{'id': 1783, 'date': '2023-12-31', 'venue': 'Madison Square Garden', 'city': 'New York', 'state': 'NY', 'coverArt': 'https://weekapaugh.us-southeast-1.linodeobjects.com/weekapaugh/shows/2023-12-31_-_Madison_Square_Garden_-_New_York,_NY/2023-12-31.png', 'favorited': True}, {'id': 1783, 'date': '2023-12-31', 'venue': 'Madison Square Garden', 'city': 'New York', 'state': 'NY', 'coverArt': 'https://weekapaugh.us-southeast-1.linodeobjects.com/weekapaugh/shows/2023-12-31_-_Madison_Square_Garden_-_New_York,_NY/2023-12-31.png', 'favorited': True}, {'id': 1782, 'date': '2023-12-30', 'venue': 'Madison Square Garden', 'city': 'New York', 'state': 'NY', 'coverArt': 'https://weekapaugh.us-southeast-1.linodeobjects.com/weekapaugh/shows/2023-12-30_-_Madison_Square_Garden_-_New_York,_NY/2023-12-30.png', 'favorited': False}]
+
+      if (!tapeHendgeResponse.ok) {
+        throw new Error("Failed to fetch data from TapeHendge API");
+      }
+
+      const tapeHendgeData: TapeHendgeShow[] = await tapeHendgeResponse.json();
+
+      // Filter out shows that are not in jamsFromAttendedShows
+      const filteredTapeHendgeShows = tapeHendgeData.filter((show) =>
+        jamsFromAttendedShows.some((jam) => jam.showdate === show.date)
+      );
+
+      let tapeHendgeSongs: EnhancedJamSong[] = [];
+
+      // For each show, query the TapeHendge API for the songs played in that show
+      for (const show of filteredTapeHendgeShows) {
+        const response = await fetch(
+          `https://hec.works/api/songs/${show.id}`
+        );
+        if (!response.ok) {
+          throw new Error(`Failed to fetch songs for show ${show.id}`);
+        }
+
+        const songs: TapeHendgeSong[] = await response.json();
+
+        // Filter out songs that are not in the jams list where the showDate matches the show date and the song title matches the jam title
+        const filteredSongs = songs.filter((song) =>
+          jamsFromAttendedShows.some(
+            (jam) => jam.showdate === show.date && jam.song === song.title
+          )
+        );
+
+        const enhancedJamSongs: EnhancedJamSong[] = filteredSongs.map((song) => {
+          const matchingJam = jamsFromAttendedShows.find(
+            (jam) => jam.showdate === show.date && jam.song === song.title
+          );
+          return {
+            ...song,
+            showDate: show.date,
+            venue: show.venue,
+            city: show.city,
+            state: show.state,
+            jamchartDescription: matchingJam?.jamchart_description
+          };
+        });
+
+        tapeHendgeSongs = [...tapeHendgeSongs, ...enhancedJamSongs];
+      }
+
+      setJamSongs(tapeHendgeSongs);
+
+
     } catch (error) {
       console.error("Error fetching shows:", error);
       setError("An error occurred while fetching data. Please try again.");
@@ -243,12 +334,11 @@ const Dashboard = () => {
         </div>
 
         {shows.length > 0 ? (
-          <div className="flex justify-center mb-12">
-          <UserProfileCard username={username} shows={shows}/>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
+            <UserProfileCard username={username} shows={shows}/>
+            <JamCard jamSongs={jamSongs} loading={loading} />
           </div>
         ) : (
-
-
         <div className="mb-12 max-w-md mx-auto">
           <div className="flex space-x-2">
             <Input
@@ -322,3 +412,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+

@@ -2,6 +2,16 @@
 
 phashboards is a personal Phish dashboard that allows fans to visualize and analyze their show attendance and song statistics.
 
+![GitHub](https://img.shields.io/github/license/paradise-runner/phashboards)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/paradise-runner/phashboards)
+![GitHub last commit](https://img.shields.io/github/last-commit/paradise-runner/phashboards)
+[![TypeScript](https://img.shields.io/badge/TypeScript-4.9+-blue.svg)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18.0+-61DAFB.svg?logo=react&logoColor=white)](https://reactjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14.2+-black.svg?logo=next.js)](https://nextjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4+-38B2AC.svg?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![Cloudflare Pages](https://img.shields.io/badge/Cloudflare-Pages-F38020.svg?logo=cloudflare)](https://pages.cloudflare.com/)
+
 ![graphs](./graphs.png)
 
 ## Features
@@ -91,3 +101,6 @@ This project is open source and available under the [GPL-3.0 License](LICENSE).
 - [shadcn/ui](https://ui.shadcn.com/) for the beautiful component library
 - [Recharts](https://recharts.org/) for the charting library
 - All the Phish fans who inspired this project
+
+## More Projects
+Check out my other projects at [hec.works](https://hec.works)! This is a personal portfolio site that showcases my work and projects. 

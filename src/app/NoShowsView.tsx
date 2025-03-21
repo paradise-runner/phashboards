@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 
 const NoShowsView = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 animate-gradient-x rounded-xl">
+    <div className="py-10 bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 animate-gradient-x rounded-xl">
       <div className="max-w-4xl mx-auto p-8">
         <Card className="mb-8">
           <CardHeader>

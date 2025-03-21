@@ -1,107 +1,25 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Sun,
-  Moon,
-  Laptop,
-  Music,
-  BarChart,
-  Home,
-  Palette,
-} from "lucide-react";
-import { useTheme } from "next-themes";
+import { Music, BarChart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import SongStatistics from "./SongStatistics";
 import ShowStatistics from "./ShowStatistics";
 import RunStatistics from "./RunStatistics";
 import NoShowsView from "./NoShowsView";
-import GradientHomeIcon from "./GradientHomeIcon";
 import UserProfileCard from "./cards/UserProfileCard";
-import { PALETTES } from "./Utils";
 import { useSearchParams } from 'next/navigation';
 import JamCard from "./components/JamCard";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 import type { Show, ApiResponse, Song, SetlistApiResponse, TapeHendgeSong, Jam, TapeHendgeShow } from "./interfaces";
 import { useRouter } from "next/navigation";
 import type { EnhancedJamSong } from "./interfaces";
 
 const API_KEY = process.env.NEXT_PUBLIC_PHISH_NET_API_KEY;
-
-const ThemeToggle = () => {
-  const { setTheme } = useTheme();
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun className="mr-2 h-4 w-4" />
-          <span>Light</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon className="mr-2 h-4 w-4" />
-          <span>Dark</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
-          <Laptop className="mr-2 h-4 w-4" />
-          <span>System</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
-interface PaletteSelectorProps {
-  selectedPalette: string;
-  onPaletteChange: (palette: string) => void;
-}
-
-const PaletteSelector: React.FC<PaletteSelectorProps> = ({
-  selectedPalette,
-  onPaletteChange,
-}) => {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Palette className="h-[1.2rem] w-[1.2rem]" />
-          <span className="sr-only">Select color palette</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {Object.keys(PALETTES).map((palette) => (
-          <DropdownMenuItem
-            key={palette}
-            onClick={() => onPaletteChange(palette)}
-          >
-            <div className="flex items-center">
-              <div
-                className="w-4 h-4 mr-2 rounded"
-                style={{ backgroundColor: PALETTES[palette][0] }}
-              />
-              <span className="capitalize">{palette}</span>
-            </div>
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
 
 const Dashboard = () => {
   const router = useRouter();
@@ -308,46 +226,31 @@ const Dashboard = () => {
   }, [initialUsername]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <nav className="bg-card shadow-md">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
-              phashboards
-            </h1>
-            <Button variant="ghost" size="icon" onClick={handleHomeClick}>
-              <GradientHomeIcon className="h-5 w-5" />
-              <span className="sr-only">Home</span>
-            </Button>
-          </div>
-          <div className="flex items-center space-x-2">
-            <PaletteSelector
-              selectedPalette={selectedPalette}
-              onPaletteChange={handlePaletteChange}
-            />
-            <ThemeToggle />
-          </div>
-        </div>
-      </nav>
+    <div className="bg-background text-foreground flex flex-col min-h-screen">
+      <Header 
+        selectedPalette={selectedPalette}
+        onPaletteChange={handlePaletteChange}
+        onHomeClick={handleHomeClick}
+      />
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-12 text-center">
-          <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1">
+        <div className="mb-8 sm:mb-12 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-3 sm:mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-500">
             Your Phish Experience
           </h2>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
             Dive into your personal Phish dashboard
           </p>
         </div>
 
         {shows.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
             <UserProfileCard username={username} shows={shows}/>
             <JamCard jamSongs={jamSongs} loading={loading} />
           </div>
         ) : (
-        <div className="mb-12 max-w-md mx-auto">
-          <div className="flex space-x-2">
+        <div className="mb-8 sm:mb-12 max-w-md mx-auto">
+          <div className="flex flex-col sm:flex-row gap-3 sm:space-x-2">
             <Input
               type="text"
               placeholder="Enter your phish.net username"
@@ -355,33 +258,39 @@ const Dashboard = () => {
               onChange={(e) => setUsername(e.target.value)}
               className="flex-grow"
             />
-            <Button onClick={fetchUserShows} disabled={loading}>
+            <Button 
+              onClick={fetchUserShows} 
+              disabled={loading}
+              className="w-full sm:w-auto"
+            >
               {loading ? "Loading..." : "Fetch Data"}
             </Button>
           </div>
-          {error && <p className="text-red-500 mt-2">{error}</p>}
+          {error && <p className="text-red-500 mt-2 text-center sm:text-left">{error}</p>}
         </div>
         )}
 
         {shows.length > 0 ? (
-          <div className="space-y-16">
-            <section className="bg-card rounded-lg shadow-xl p-6 dark:outline outline-offset-1 outline-purple-400">
-              <h2 className="text-3xl font-semibold mb-6 flex items-center">
-                <BarChart className="mr-2" /> Show Statistics
+          <div className="space-y-10 sm:space-y-16">
+            <section className="bg-card rounded-lg shadow-xl p-4 sm:p-6 dark:outline outline-offset-1 outline-purple-400">
+              <h2 className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6 flex items-center">
+                <BarChart className="mr-2 h-5 w-5 sm:h-6 sm:w-6" /> Show Statistics
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <ShowStatistics
                   shows={shows}
                   selectedPalette={selectedPalette}
                 />
               </div>
             </section>
-            <Separator className="my-8" />
-            <section className="bg-card rounded-lg shadow-xl p-6 dark:outline outline-offset-1 outline-blue-400">
-              <h2 className="text-3xl font-semibold mb-6 flex items-center">
-                <Music className="mr-2" /> Song Statistics
+            
+            <Separator className="my-6 sm:my-8" />
+            
+            <section className="bg-card rounded-lg shadow-xl p-4 sm:p-6 dark:outline outline-offset-1 outline-blue-400">
+              <h2 className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6 flex items-center">
+                <Music className="mr-2 h-5 w-5 sm:h-6 sm:w-6" /> Song Statistics
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <SongStatistics
                   songs={songs}
                   shows={showsWithSongs}
@@ -390,12 +299,14 @@ const Dashboard = () => {
                 />
               </div>
             </section>
-            <Separator className="my-8" />
-            <section className="bg-card rounded-lg shadow-xl p-6 dark:outline outline-offset-1 outline-purple-400">
-              <h2 className="text-3xl font-semibold mb-6 flex items-center">
-                <Music className="mr-2" /> Run Statistics
+            
+            <Separator className="my-6 sm:my-8" />
+            
+            <section className="bg-card rounded-lg shadow-xl p-4 sm:p-6 dark:outline outline-offset-1 outline-purple-400">
+              <h2 className="text-2xl sm:text-3xl font-semibold mb-4 sm:mb-6 flex items-center">
+                <Music className="mr-2 h-5 w-5 sm:h-6 sm:w-6" /> Run Statistics
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <RunStatistics
                   shows={shows}
                   showsWithSongs={showsWithSongs}
@@ -409,11 +320,7 @@ const Dashboard = () => {
         )}
       </main>
 
-      <footer className="bg-card mt-16 py-6">
-        <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>&copy; 2024 phashboards. All rights reserved.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

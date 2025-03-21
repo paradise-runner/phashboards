@@ -32,7 +32,7 @@ export interface Show {
   }
 
   export interface Jam {
-    showid: string;
+    showid: number;
     showdate: string;
     permalink: string;
     showyear: string;

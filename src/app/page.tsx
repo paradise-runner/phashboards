@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Sun,
   Moon,
@@ -107,6 +107,7 @@ const Dashboard = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialUsername = searchParams.get("username") || "";
+  const initialFetchPerformed = useRef(false);
 
   const [username, setUsername] = useState(initialUsername);
   const [shows, setShows] = useState<Show[]>([]);
@@ -212,10 +213,13 @@ const Dashboard = () => {
 
       const yearsAttended = sortedShows.map((show) => new Date(show.showdate).getFullYear());
 
+      // remove duplicates
+      const uniqueYears = Array.from(new Set(yearsAttended));
+
       let jams: Jam[] = [];
 
       // Query PhishNet API for JamCharts for years of attendance
-      for (const year of yearsAttended) {
+      for (const year of uniqueYears) {
         const response = await fetch(
           `https://api.phish.net/v5/jamcharts/showyear/${year}.json?apikey=${API_KEY}`
         );
@@ -227,12 +231,14 @@ const Dashboard = () => {
       }
 
       // Filter out jams that are not from the shows attended
-      const jamsFromAttendedShows = jams.filter(jam => sortedShows.some(show => show.showid.toString() === jam.showid));
+      const jamsFromAttendedShows = jams.filter(jam => sortedShows.some(show => show.showid === jam.showid));
 
       // Query TapeHendge API for all shows
       const tapeHendgeResponse = await fetch(
         "https://hec.works/api/shows"
       );
+
+      console.log("TapeHendge API response:", tapeHendgeResponse);
       // example response
       // [{'id': 1783, 'date': '2023-12-31', 'venue': 'Madison Square Garden', 'city': 'New York', 'state': 'NY', 'coverArt': 'https://weekapaugh.us-southeast-1.linodeobjects.com/weekapaugh/shows/2023-12-31_-_Madison_Square_Garden_-_New_York,_NY/2023-12-31.png', 'favorited': True}, {'id': 1783, 'date': '2023-12-31', 'venue': 'Madison Square Garden', 'city': 'New York', 'state': 'NY', 'coverArt': 'https://weekapaugh.us-southeast-1.linodeobjects.com/weekapaugh/shows/2023-12-31_-_Madison_Square_Garden_-_New_York,_NY/2023-12-31.png', 'favorited': True}, {'id': 1782, 'date': '2023-12-30', 'venue': 'Madison Square Garden', 'city': 'New York', 'state': 'NY', 'coverArt': 'https://weekapaugh.us-southeast-1.linodeobjects.com/weekapaugh/shows/2023-12-30_-_Madison_Square_Garden_-_New_York,_NY/2023-12-30.png', 'favorited': False}]
 
@@ -295,7 +301,8 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    if (initialUsername) {
+    if (initialUsername && !initialFetchPerformed.current) {
+      initialFetchPerformed.current = true;
       fetchUserShows();
     }
   }, [initialUsername]);

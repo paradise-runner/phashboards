@@ -26,7 +26,6 @@ const UserProfileCard: React.FC<UserProfileCardProps> = ({ username, shows }) =>
   const uniqueVenues = new Set(shows.map(show => show.venue)).size;
 
   const formatDate = (dateStr: string) => {
-    console.log(dateStr);
     return new Date(dateStr).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
